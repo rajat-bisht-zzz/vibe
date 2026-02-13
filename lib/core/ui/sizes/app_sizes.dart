@@ -4,7 +4,7 @@ class AppSizes {
   static const double zero = 0;
 
   // micro spacing
-  static const double nano = 1;  
+  static const double nano = 1;
   static const double xxs = 2;
   static const double xs = 4;
 

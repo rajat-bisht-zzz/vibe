@@ -7,13 +7,10 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: AppTextStyles.fontFamily,
-
       scaffoldBackgroundColor: AppColors.background,
-
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
       ),
-
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,

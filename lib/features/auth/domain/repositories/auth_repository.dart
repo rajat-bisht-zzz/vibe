@@ -1,7 +1,6 @@
 import '../entities/user.dart';
 
 abstract class AuthRepository {
-
   /// Save user locally after onboarding
   Future<void> saveUser(User user);
 
