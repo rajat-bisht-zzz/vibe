@@ -1,16 +1,32 @@
-# vibe
+# Vibe
 
-A new Flutter project.
+Vibe is an invite-based real-time messaging application built using Flutter.
 
-## Getting Started
+Users can start a private conversation simply by sharing an invite link — no phone number or contact sync required.
 
-This project is a starting point for a Flutter application.
+## Tech Stack
+- Flutter
+- Clean Architecture
+- BLoC
+- Dio
+- Secure Storage
+- Deep Linking (planned)
+- WebSockets (planned)
 
-A few resources to get you started if this is your first Flutter project:
+## Features (Planned)
+- Invite link onboarding
+- 1-to-1 messaging
+- Offline message queue
+- Message status (sent, delivered, read)
+- Push notifications
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Architecture
+Feature-first Clean Architecture:
+core → shared services & design system  
+features → auth, invite, chat modules
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Current Progress
+- Project setup
+- iOS device deployment
+- Theming system
+- Typography & spacing design system
