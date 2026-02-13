@@ -6,6 +6,7 @@ import '../../features/auth/data/repositories_impl/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/save_user_usecase.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -21,6 +22,14 @@ Future<void> initServiceLocator() async {
   /// Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(sl()),
+  );
+
+  /// Bloc
+  sl.registerFactory(
+    () => AuthBloc(
+      saveUserUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
   );
 
   /// Usecases
