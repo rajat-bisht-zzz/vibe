@@ -11,3 +11,5 @@ class RegisterUserEvent extends AuthEvent {
 
   RegisterUserEvent(this.name);
 }
+
+class LogoutEvent extends AuthEvent {}

@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:vibe/core/storage/storage_manager.dart';
 
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
 import '../../features/auth/data/repositories_impl/auth_repository_impl.dart';
@@ -8,31 +9,34 @@ import '../../features/auth/domain/usecases/save_user_usecase.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 
-final sl = GetIt.instance;
+final getIt = GetIt.instance;
 
 Future<void> initServiceLocator() async {
   /// External
-  sl.registerLazySingleton(() => const FlutterSecureStorage());
+  getIt.registerLazySingleton(() => const FlutterSecureStorage());
 
   /// Data Sources
-  sl.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSource(sl()),
+  getIt.registerLazySingleton<AuthLocalDataSource>(
+    () => AuthLocalDataSource(getIt()),
   );
 
   /// Repository
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(sl()),
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(getIt()),
   );
 
   /// Bloc
-  sl.registerFactory(
+  getIt.registerFactory(
     () => AuthBloc(
-      saveUserUseCase: sl(),
-      getCurrentUserUseCase: sl(),
+      saveUserUseCase: getIt(),
+      getCurrentUserUseCase: getIt(),
     ),
   );
 
   /// Usecases
-  sl.registerLazySingleton(() => SaveUserUseCase(sl()));
-  sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
+  getIt.registerLazySingleton(() => SaveUserUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetCurrentUserUseCase(getIt()));
+
+  ///Storage
+  getIt.registerLazySingleton<SessionManager>(() => SessionManager());
 }

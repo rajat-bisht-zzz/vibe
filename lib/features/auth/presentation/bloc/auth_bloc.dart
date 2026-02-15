@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
+import 'package:vibe/core/services/service_locator.dart';
+import 'package:vibe/core/storage/storage_manager.dart';
 
 import '../../domain/entities/user.dart';
 import '../../domain/usecases/get_current_user_usecase.dart';
@@ -21,6 +23,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await getCurrentUserUseCase();
 
       if (user != null) {
+        getIt<SessionManager>().setUser(user);
         emit(Authenticated(user));
       } else {
         emit(Unauthenticated());
@@ -36,7 +39,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       await saveUserUseCase(newUser);
+
+      getIt<SessionManager>().setUser(newUser);
+
       emit(Authenticated(newUser));
+    });
+
+    //Logout
+    on<LogoutEvent>((event, emit) async {
+      getIt<SessionManager>().clear();
+
+      emit(Unauthenticated());
     });
   }
 }
