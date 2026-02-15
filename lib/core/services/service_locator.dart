@@ -9,9 +9,11 @@ import '../../features/auth/data/repositories_impl/chat_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/repositories/chat_repository.dart';
 import '../../features/auth/domain/usecases/create_chat_usecase.dart';
+import '../../features/auth/domain/usecases/get_chats_usecase.dart';
 import '../../features/auth/domain/usecases/save_user_usecase.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
-import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/bloc/auth/auth_bloc.dart';
+import '../../features/auth/presentation/bloc/chat_list/chat_list_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -36,10 +38,14 @@ Future<void> initServiceLocator() async {
       getCurrentUserUseCase: getIt(),
     ),
   );
+  getIt.registerFactory(() => ChatListBloc(getIt()));
+
 
   /// Usecases
   getIt.registerLazySingleton(() => SaveUserUseCase(getIt()));
   getIt.registerLazySingleton(() => GetCurrentUserUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetChatsUseCase(getIt()));
+
 
   ///Storage
   getIt.registerLazySingleton<SessionManager>(() => SessionManager());

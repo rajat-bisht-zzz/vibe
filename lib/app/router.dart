@@ -21,8 +21,6 @@ final GoRouter appRouter = GoRouter(
     final loggedIn = session.isLoggedIn;
     final goingToOnboarding = state.uri.path == '/onboarding';
 
-    debugPrint("REDIRECT -> loggedIn=$loggedIn  current=${state.uri.path}");
-
     /// Not logged in → always onboarding
     if (!loggedIn && !goingToOnboarding) {
       return '/onboarding';

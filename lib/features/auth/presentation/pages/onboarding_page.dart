@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe/core/ui/font/app_font_style.dart';
 import 'package:vibe/core/ui/sizes/app_sizes.dart';
-import '../bloc/auth_bloc.dart';
+import '../bloc/auth/auth_bloc.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});

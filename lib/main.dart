@@ -4,7 +4,7 @@ import 'package:vibe/app/router.dart';
 
 import 'core/services/service_locator.dart';
 import 'core/ui/theme/app_theme.dart';
-import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth/auth_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

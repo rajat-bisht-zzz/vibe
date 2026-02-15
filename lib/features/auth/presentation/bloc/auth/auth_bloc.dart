@@ -3,12 +3,17 @@ import 'package:uuid/uuid.dart';
 import 'package:vibe/core/services/service_locator.dart';
 import 'package:vibe/core/storage/storage_manager.dart';
 
-import '../../domain/entities/user.dart';
-import '../../domain/usecases/get_current_user_usecase.dart';
-import '../../domain/usecases/save_user_usecase.dart';
+import '../../../domain/entities/user.dart';
+import '../../../domain/usecases/get_current_user_usecase.dart';
+import '../../../domain/usecases/save_user_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
+
+String generateInviteCode() {
+  final millis = DateTime.now().millisecondsSinceEpoch;
+  return "VIBE-${millis.toString().substring(7, 13)}";
+}
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SaveUserUseCase saveUserUseCase;
@@ -35,6 +40,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final newUser = User(
         id: const Uuid().v4(),
         displayName: event.name,
+        inviteCode: generateInviteCode(),
         createdAt: DateTime.now(),
       );
 

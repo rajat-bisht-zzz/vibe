@@ -4,6 +4,7 @@ class UserModel extends User {
   const UserModel({
     required super.id,
     required super.displayName,
+    required super.inviteCode,
     required super.createdAt,
   });
 
@@ -12,6 +13,7 @@ class UserModel extends User {
     return UserModel(
       id: json['id'],
       displayName: json['displayName'],
+      inviteCode: json['inviteCode'] ?? _generateFallbackCode(),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
@@ -21,6 +23,7 @@ class UserModel extends User {
     return {
       'id': id,
       'displayName': displayName,
+      'inviteCode': inviteCode,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -30,6 +33,7 @@ class UserModel extends User {
     return User(
       id: id,
       displayName: displayName,
+      inviteCode: inviteCode,
       createdAt: createdAt,
     );
   }
@@ -39,7 +43,14 @@ class UserModel extends User {
     return UserModel(
       id: user.id,
       displayName: user.displayName,
+      inviteCode: user.inviteCode,
       createdAt: user.createdAt,
     );
   }
+
+  static String _generateFallbackCode() {
+  final millis = DateTime.now().millisecondsSinceEpoch;
+  return "VIBE-${millis.toString().substring(7, 13)}";
+}
+
 }
