@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibe/features/auth/presentation/pages/enter_invite_page.dart';
 
 import '../../features/auth/presentation/pages/home_page.dart';
 import '../../features/auth/presentation/pages/onboarding_page.dart';
 import '../core/services/service_locator.dart';
 import '../core/storage/storage_manager.dart';
+import '../features/auth/presentation/pages/chat_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -46,6 +48,17 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/home',
       builder: (context, state) => const HomePage(),
+    ),
+    GoRoute(
+      path: '/invite',
+      builder: (context, state) => const EnterInvitePage(),
+    ),
+    GoRoute(
+      path: '/chat/:chatId',
+      builder: (context, state) {
+        final id = state.pathParameters['chatId']!;
+        return ChatPage(chatId: id);
+      },
     ),
   ],
 );

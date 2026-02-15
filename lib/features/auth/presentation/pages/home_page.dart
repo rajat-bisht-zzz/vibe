@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vibe/core/storage/storage_manager.dart';
 import 'package:vibe/features/auth/presentation/bloc/auth_bloc.dart';
 import '../../../../core/services/service_locator.dart';
@@ -25,14 +26,25 @@ class HomePage extends StatelessWidget {
         ],
         centerTitle: true,
       ),
-      body: Center(
-        child: Text(
-          'Welcome, ${user.displayName} 👋',
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
+      body: Column(
+        children: [
+          Center(
+            child: Text(
+              'Welcome, ${user.displayName} 👋',
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-        ),
+          const SizedBox(height: 30),
+          ElevatedButton(
+            onPressed: () {
+              context.push('/invite');
+            },
+            child: const Text("Add Friend"),
+          ),
+        ],
       ),
     );
   }

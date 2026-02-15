@@ -3,8 +3,12 @@ import 'package:get_it/get_it.dart';
 import 'package:vibe/core/storage/storage_manager.dart';
 
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
+import '../../features/auth/data/datasources/chat_local_datasource.dart';
 import '../../features/auth/data/repositories_impl/auth_repository_impl.dart';
+import '../../features/auth/data/repositories_impl/chat_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/domain/repositories/chat_repository.dart';
+import '../../features/auth/domain/usecases/create_chat_usecase.dart';
 import '../../features/auth/domain/usecases/save_user_usecase.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
@@ -39,4 +43,15 @@ Future<void> initServiceLocator() async {
 
   ///Storage
   getIt.registerLazySingleton<SessionManager>(() => SessionManager());
+
+  /// CHAT
+  getIt.registerLazySingleton(() => ChatLocalDataSource());
+
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(getIt()),
+  );
+
+  getIt.registerLazySingleton(
+    () => CreateChatUseCase(getIt()),
+  );
 }
