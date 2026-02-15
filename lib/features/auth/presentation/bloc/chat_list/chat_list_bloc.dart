@@ -9,7 +9,6 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
   final GetChatsUseCase getChats;
 
   ChatListBloc(this.getChats) : super(ChatListInitial()) {
-
     on<LoadChatsEvent>((event, emit) async {
       emit(ChatListLoading());
 

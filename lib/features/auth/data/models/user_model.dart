@@ -49,8 +49,7 @@ class UserModel extends User {
   }
 
   static String _generateFallbackCode() {
-  final millis = DateTime.now().millisecondsSinceEpoch;
-  return "VIBE-${millis.toString().substring(7, 13)}";
-}
-
+    final millis = DateTime.now().millisecondsSinceEpoch;
+    return "VIBE-${millis.toString().substring(7, 13)}";
+  }
 }

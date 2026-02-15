@@ -1,6 +1,5 @@
 part of 'chat_list_bloc.dart';
 
-
 abstract class ChatListState {}
 
 class ChatListInitial extends ChatListState {}
