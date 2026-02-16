@@ -1,21 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibe/core/storage/user_directory.dart';
 import 'package:vibe/features/auth/presentation/bloc/auth/auth_bloc.dart';
 
 import '../../../../core/services/service_locator.dart';
 import '../../../../core/storage/storage_manager.dart';
 import '../bloc/chat_list/chat_list_bloc.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late ChatListBloc bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = getIt<ChatListBloc>();
+    bloc.add(LoadChatsEvent());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    /// called when coming back from another page
+    bloc.add(LoadChatsEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = getIt<SessionManager>().currentUser!;
 
-    return BlocProvider(
-      create: (_) => getIt<ChatListBloc>()..add(LoadChatsEvent()),
+    return BlocProvider.value(
+      value: bloc,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Vibe'),
@@ -71,12 +94,15 @@ class HomePage extends StatelessWidget {
                       itemCount: state.chats.length,
                       itemBuilder: (context, index) {
                         final chat = state.chats[index];
-
+                        final myId = getIt<SessionManager>().currentUser!.id;
+                        final otherUserId =
+                            chat.userA == myId ? chat.userB : chat.userA;
+                        final otherUser = UserDirectory.getById(otherUserId);
                         return ListTile(
                           leading: const CircleAvatar(
                             child: Icon(Icons.person),
                           ),
-                          title: Text("Chat ${chat.id.substring(0, 6)}"),
+                          title: Text(otherUser?.displayName ?? "Unknown user"),
                           subtitle: const Text("Tap to open conversation"),
                           onTap: () {
                             context.push('/chat/${chat.id}');

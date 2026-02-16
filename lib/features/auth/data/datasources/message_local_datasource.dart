@@ -12,4 +12,9 @@ class MessageLocalDataSource {
     _messages.putIfAbsent(message.chatId, () => []);
     _messages[message.chatId]!.add(message);
   }
+
+  static void clear() {
+  _messages.clear();
+}
+
 }

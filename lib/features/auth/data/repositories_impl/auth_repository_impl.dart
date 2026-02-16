@@ -1,3 +1,5 @@
+import 'package:vibe/features/auth/data/models/user_model.dart';
+
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_datasource.dart';
@@ -13,8 +15,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User?> getCurrentUser() {
-    return localDataSource.getUser();
+  Future<User?> getCurrentUser() async {
+    try {
+      return await localDataSource.getCurrentUser();
+    } catch (_) {
+      await localDataSource.clearUser();
+      return null;
+    }
   }
 
   @override

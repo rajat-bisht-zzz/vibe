@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibe/core/services/service_locator.dart';
+import 'package:vibe/features/auth/presentation/bloc/chat_list/chat_list_bloc.dart';
 
 import '../../../../core/storage/storage_manager.dart';
 import '../../domain/usecases/create_chat_usecase.dart';
@@ -47,16 +50,22 @@ class _EnterInvitePageState extends State<EnterInvitePage> {
             ElevatedButton(
               onPressed: () async {
                 final code = controller.text.trim();
+                if (code.isEmpty) return;
 
-                final session = GetIt.I<SessionManager>();
+                final session = getIt<SessionManager>();
                 final myId = session.currentUser!.id;
 
-                final createChat = GetIt.I<CreateChatUseCase>();
+                final createChat = getIt<CreateChatUseCase>();
 
                 final chat = await createChat(myId, code);
 
-                if (!context.mounted) return;
+                /// IMPORTANT SAFETY CHECK
+                if (!mounted) return;
 
+                /// notify chat list
+                context.read<ChatListBloc>().add(LoadChatsEvent());
+
+                /// navigate
                 context.push('/chat/${chat.id}');
               },
               child: const Text("Start Chat"),

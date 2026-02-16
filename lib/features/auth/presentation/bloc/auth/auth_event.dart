@@ -2,14 +2,21 @@ part of 'auth_bloc.dart';
 
 abstract class AuthEvent {}
 
-/// Fired when app launches
 class CheckAuthEvent extends AuthEvent {}
 
-/// Fired when user submits name
-class RegisterUserEvent extends AuthEvent {
-  final String name;
+class RegisterEvent extends AuthEvent {
+  final String username;
+  final String password;
+  final String displayName;
 
-  RegisterUserEvent(this.name);
+  RegisterEvent(this.username, this.password, this.displayName);
+}
+
+class LoginEvent extends AuthEvent {
+  final String username;
+  final String password;
+
+  LoginEvent(this.username, this.password);
 }
 
 class LogoutEvent extends AuthEvent {}

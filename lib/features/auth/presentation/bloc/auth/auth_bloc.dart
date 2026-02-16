@@ -2,7 +2,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import 'package:vibe/core/services/service_locator.dart';
 import 'package:vibe/core/storage/storage_manager.dart';
+import 'package:vibe/core/storage/user_directory.dart';
 
+import '../../../../../core/utils/password_hasher.dart';
+import '../../../data/datasources/chat_local_datasource.dart';
+import '../../../data/datasources/message_local_datasource.dart';
 import '../../../domain/entities/user.dart';
 import '../../../domain/usecases/get_current_user_usecase.dart';
 import '../../../domain/usecases/save_user_usecase.dart';
@@ -29,6 +33,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (user != null) {
         getIt<SessionManager>().setUser(user);
+        UserDirectory.addUser(user);
+
         emit(Authenticated(user));
       } else {
         emit(Unauthenticated());
@@ -36,25 +42,55 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     /// User enters name
-    on<RegisterUserEvent>((event, emit) async {
-      final newUser = User(
-        id: const Uuid().v4(),
-        displayName: event.name,
-        inviteCode: generateInviteCode(),
-        createdAt: DateTime.now(),
-      );
+  on<RegisterEvent>((event, emit) async {
 
-      await saveUserUseCase(newUser);
+  final existing = UserDirectory.getByUsername(event.username);
 
-      getIt<SessionManager>().setUser(newUser);
+  if (existing != null) {
+    emit(AuthError("Username already exists"));
+    return;
+  }
 
-      emit(Authenticated(newUser));
-    });
+  final newUser = User(
+    id: const Uuid().v4(),
+    username: event.username,
+    displayName: event.displayName,
+    passwordHash: hashPassword(event.password),
+    inviteCode: generateInviteCode(),
+    createdAt: DateTime.now(),
+  );
+
+  UserDirectory.addUser(newUser);
+  await saveUserUseCase(newUser);
+
+  getIt<SessionManager>().setUser(newUser);
+  emit(Authenticated(newUser));
+});
+
+//login
+on<LoginEvent>((event, emit) async {
+
+  final user = UserDirectory.getByUsername(event.username);
+
+  if (user == null ||
+      user.passwordHash != hashPassword(event.password)) {
+    emit(AuthError("Invalid username or password"));
+    return;
+  }
+
+  await saveUserUseCase(user);
+  getIt<SessionManager>().setUser(user);
+
+  emit(Authenticated(user));
+});
+
+
 
     //Logout
     on<LogoutEvent>((event, emit) async {
       getIt<SessionManager>().clear();
-
+ChatLocalDataSource.clear();
+  MessageLocalDataSource.clear();
       emit(Unauthenticated());
     });
   }

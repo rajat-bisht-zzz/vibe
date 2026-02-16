@@ -6,15 +6,21 @@ class UserModel extends User {
     required super.displayName,
     required super.inviteCode,
     required super.createdAt,
+    required super.username,
+    required super.passwordHash,
   });
 
   /// Convert JSON → Model
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final username = json['username'] ?? json['displayName'] ?? "guest";
+    final passwordHash = json['passwordHash'] ?? "";
     return UserModel(
       id: json['id'],
-      displayName: json['displayName'],
+      displayName: json['displayName'] ?? username,
       inviteCode: json['inviteCode'] ?? _generateFallbackCode(),
       createdAt: DateTime.parse(json['createdAt']),
+      username: json['username'],
+      passwordHash: passwordHash,
     );
   }
 
@@ -35,6 +41,8 @@ class UserModel extends User {
       displayName: displayName,
       inviteCode: inviteCode,
       createdAt: createdAt,
+      username: username,
+      passwordHash: passwordHash,
     );
   }
 
@@ -45,6 +53,8 @@ class UserModel extends User {
       displayName: user.displayName,
       inviteCode: user.inviteCode,
       createdAt: user.createdAt,
+      username: user.username,
+      passwordHash: user.passwordHash,
     );
   }
 

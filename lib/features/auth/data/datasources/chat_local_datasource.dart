@@ -19,4 +19,8 @@ class ChatLocalDataSource {
       return null;
     }
   }
+
+  static void clear() {
+    _chats.clear();
+  }
 }

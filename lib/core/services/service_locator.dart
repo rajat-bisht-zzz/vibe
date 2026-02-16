@@ -44,7 +44,7 @@ Future<void> initServiceLocator() async {
       getCurrentUserUseCase: getIt(),
     ),
   );
-  getIt.registerFactory(() => ChatListBloc(getIt()));
+  getIt.registerLazySingleton(() => ChatListBloc(getIt()));
 
   /// Usecases
   getIt.registerLazySingleton(() => SaveUserUseCase(getIt()));
