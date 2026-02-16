@@ -13,8 +13,6 @@ class SessionManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  
-
   void clear() {
     _currentUser = null;
     notifyListeners();

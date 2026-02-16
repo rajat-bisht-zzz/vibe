@@ -42,55 +42,50 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     /// User enters name
-  on<RegisterEvent>((event, emit) async {
+    on<RegisterEvent>((event, emit) async {
+      final existing = UserDirectory.getByUsername(event.username);
 
-  final existing = UserDirectory.getByUsername(event.username);
+      if (existing != null) {
+        emit(AuthError("Username already exists"));
+        return;
+      }
 
-  if (existing != null) {
-    emit(AuthError("Username already exists"));
-    return;
-  }
+      final newUser = User(
+        id: const Uuid().v4(),
+        username: event.username,
+        displayName: event.displayName,
+        passwordHash: hashPassword(event.password),
+        inviteCode: generateInviteCode(),
+        createdAt: DateTime.now(),
+      );
 
-  final newUser = User(
-    id: const Uuid().v4(),
-    username: event.username,
-    displayName: event.displayName,
-    passwordHash: hashPassword(event.password),
-    inviteCode: generateInviteCode(),
-    createdAt: DateTime.now(),
-  );
+      UserDirectory.addUser(newUser);
+      await saveUserUseCase(newUser);
 
-  UserDirectory.addUser(newUser);
-  await saveUserUseCase(newUser);
-
-  getIt<SessionManager>().setUser(newUser);
-  emit(Authenticated(newUser));
-});
+      getIt<SessionManager>().setUser(newUser);
+      emit(Authenticated(newUser));
+    });
 
 //login
-on<LoginEvent>((event, emit) async {
+    on<LoginEvent>((event, emit) async {
+      final user = UserDirectory.getByUsername(event.username);
 
-  final user = UserDirectory.getByUsername(event.username);
+      if (user == null || user.passwordHash != hashPassword(event.password)) {
+        emit(AuthError("Invalid username or password"));
+        return;
+      }
 
-  if (user == null ||
-      user.passwordHash != hashPassword(event.password)) {
-    emit(AuthError("Invalid username or password"));
-    return;
-  }
+      await saveUserUseCase(user);
+      getIt<SessionManager>().setUser(user);
 
-  await saveUserUseCase(user);
-  getIt<SessionManager>().setUser(user);
-
-  emit(Authenticated(user));
-});
-
-
+      emit(Authenticated(user));
+    });
 
     //Logout
     on<LogoutEvent>((event, emit) async {
       getIt<SessionManager>().clear();
-ChatLocalDataSource.clear();
-  MessageLocalDataSource.clear();
+      ChatLocalDataSource.clear();
+      MessageLocalDataSource.clear();
       emit(Unauthenticated());
     });
   }

@@ -11,6 +11,7 @@ class Authenticated extends AuthState {
 
   Authenticated(this.user);
 }
+
 class AuthError extends AuthState {
   final String message;
 

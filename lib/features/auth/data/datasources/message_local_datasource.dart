@@ -14,7 +14,6 @@ class MessageLocalDataSource {
   }
 
   static void clear() {
-  _messages.clear();
-}
-
+    _messages.clear();
+  }
 }
