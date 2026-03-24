@@ -14,6 +14,6 @@ class MessageRepositoryImpl implements MessageRepository {
 
   @override
   Future<void> sendMessage(Message message) async {
-    local.sendMessage(message);
+    await local.sendMessage(message);
   }
 }

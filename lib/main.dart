@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe/app/router.dart';
+import 'package:vibe/core/database/isar_service.dart';
 import 'package:vibe/features/auth/presentation/bloc/chat_list/chat_list_bloc.dart';
 
 import 'core/services/service_locator.dart';
+import 'core/storage/storage_manager.dart';
+import 'core/storage/user_directory.dart';
 import 'core/ui/theme/app_theme.dart';
+import 'features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'features/auth/presentation/bloc/auth/auth_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initServiceLocator();
+  await DatabaseService.init();
+
+  // Restore persisted session BEFORE runApp so the router's first
+  // redirect evaluation sees the correct isLoggedIn value.
+  final savedUser = await getIt<GetCurrentUserUseCase>()();
+  if (savedUser != null) {
+    getIt<SessionManager>().setUser(savedUser);
+    UserDirectory.addUser(savedUser);
+  }
 
   runApp(const VibeApp());
 }

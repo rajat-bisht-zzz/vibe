@@ -1,5 +1,6 @@
 String formatTime(DateTime time) {
-  final hour = time.hour > 12 ? time.hour - 12 : time.hour;
+  int hour = time.hour % 12;
+  if (hour == 0) hour = 12;
   final minute = time.minute.toString().padLeft(2, '0');
   final period = time.hour >= 12 ? 'PM' : 'AM';
 

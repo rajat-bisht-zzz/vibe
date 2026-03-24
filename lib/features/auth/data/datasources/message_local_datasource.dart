@@ -1,19 +1,49 @@
+import 'package:sqflite/sqflite.dart';
+import 'package:vibe/core/database/isar_service.dart';
+import 'package:vibe/features/chat/data/models/message_model.dart';
+
 import '../../domain/entities/message.dart';
 
 class MessageLocalDataSource {
-  /// chatId -> list of messages
-  static final Map<String, List<Message>> _messages = {};
+  Database get _db => DatabaseService.db;
 
-  List<Message> getMessages(String chatId) {
-    return _messages[chatId] ?? [];
+  Future<List<Message>> getMessages(String chatId) async {
+    final rows = await _db.query(
+      'messages',
+      where: 'chatId = ?',
+      whereArgs: [chatId],
+      orderBy: 'createdAt ASC',
+    );
+
+    return rows
+        .map((row) => MessageModel.fromMap(row))
+        .map((m) => Message(
+              id: m.messageId,
+              chatId: m.chatId,
+              senderId: m.senderId,
+              text: m.text,
+              createdAt: m.createdAt,
+            ))
+        .toList();
   }
 
-  void sendMessage(Message message) {
-    _messages.putIfAbsent(message.chatId, () => []);
-    _messages[message.chatId]!.add(message);
+  Future<void> sendMessage(Message message) async {
+    final model = MessageModel(
+      messageId: message.id,
+      chatId: message.chatId,
+      senderId: message.senderId,
+      text: message.text,
+      createdAt: message.createdAt,
+    );
+
+    await _db.insert(
+      'messages',
+      model.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
-  static void clear() {
-    _messages.clear();
+  Future<void> clear() async {
+    await _db.delete('messages');
   }
 }

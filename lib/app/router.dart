@@ -1,61 +1,65 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibe/core/services/service_locator.dart';
+import 'package:vibe/core/storage/storage_manager.dart';
+import 'package:vibe/features/auth/presentation/bloc/chat/chat_bloc.dart';
+import 'package:vibe/features/auth/presentation/pages/chat_page.dart';
 import 'package:vibe/features/auth/presentation/pages/enter_invite_page.dart';
+import 'package:vibe/features/auth/presentation/pages/home_page.dart';
+import 'package:vibe/features/auth/presentation/pages/onboarding_page.dart';
 
-import '../../features/auth/presentation/pages/home_page.dart';
-import '../../features/auth/presentation/pages/onboarding_page.dart';
-import '../core/services/service_locator.dart';
-import '../core/storage/storage_manager.dart';
-import '../features/auth/presentation/pages/chat_page.dart';
+abstract final class AppRoutes {
+  static const root = '/';
+  static const onboarding = '/onboarding';
+  static const home = '/home';
+  static const invite = '/invite';
+  static const chat = '/chat/:chatId';
+
+  static String chatRoute(String chatId) => '/chat/$chatId';
+}
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
-
-  /// THIS is the magic line
+  initialLocation: AppRoutes.root,
   refreshListenable: getIt<SessionManager>(),
-
-  /// Route protection
   redirect: (context, state) {
     final session = getIt<SessionManager>();
+    final path = state.uri.path;
 
-    final loggedIn = session.isLoggedIn;
-    final goingToOnboarding = state.uri.path == '/onboarding';
-
-    /// Not logged in → always onboarding
-    if (!loggedIn && !goingToOnboarding) {
-      return '/onboarding';
+    if (!session.isLoggedIn && path != AppRoutes.onboarding) {
+      return AppRoutes.onboarding;
     }
 
-    /// Logged in → never onboarding
-    if (loggedIn && goingToOnboarding) {
-      return '/home';
+    if (session.isLoggedIn && path == AppRoutes.onboarding) {
+      return AppRoutes.home;
     }
 
     return null;
   },
-
   routes: [
     GoRoute(
-      path: '/',
-      redirect: (_, __) => '/onboarding',
+      path: AppRoutes.root,
+      redirect: (_, __) => AppRoutes.onboarding,
     ),
     GoRoute(
-      path: '/onboarding',
+      path: AppRoutes.onboarding,
       builder: (context, state) => const OnboardingPage(),
     ),
     GoRoute(
-      path: '/home',
+      path: AppRoutes.home,
       builder: (context, state) => const HomePage(),
     ),
     GoRoute(
-      path: '/invite',
+      path: AppRoutes.invite,
       builder: (context, state) => const EnterInvitePage(),
     ),
     GoRoute(
-      path: '/chat/:chatId',
+      path: AppRoutes.chat,
       builder: (context, state) {
-        final id = state.pathParameters['chatId']!;
-        return ChatPage(chatId: id);
+        final chatId = state.pathParameters['chatId']!;
+        return BlocProvider(
+          create: (_) => getIt<ChatBloc>()..add(LoadMessagesEvent(chatId)),
+          child: ChatPage(chatId: chatId),
+        );
       },
     ),
   ],

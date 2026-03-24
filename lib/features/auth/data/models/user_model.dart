@@ -24,11 +24,12 @@ class UserModel extends User {
     );
   }
 
-  /// Convert Model → JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'username': username,
       'displayName': displayName,
+      'passwordHash': passwordHash,
       'inviteCode': inviteCode,
       'createdAt': createdAt.toIso8601String(),
     };

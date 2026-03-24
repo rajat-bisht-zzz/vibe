@@ -84,8 +84,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     //Logout
     on<LogoutEvent>((event, emit) async {
       getIt<SessionManager>().clear();
-      ChatLocalDataSource.clear();
-      MessageLocalDataSource.clear();
+      await getIt<ChatLocalDataSource>().clear();
+      await getIt<MessageLocalDataSource>().clear();
       emit(Unauthenticated());
     });
   }

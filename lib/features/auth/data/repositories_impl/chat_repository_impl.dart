@@ -25,7 +25,7 @@ class ChatRepositoryImpl implements ChatRepository {
       createdAt: DateTime.now(),
     );
 
-    local.createChat(chat);
+    await local.createChat(chat);
     return chat;
   }
 
@@ -33,8 +33,7 @@ class ChatRepositoryImpl implements ChatRepository {
   Future<List<Chat>> getChats() async {
     final myId = getIt<SessionManager>().currentUser!.id;
 
-    final allChats = local.getChats();
-
+    final allChats = await local.getChats();
     return allChats
         .where((chat) => chat.userA == myId || chat.userB == myId)
         .toList();

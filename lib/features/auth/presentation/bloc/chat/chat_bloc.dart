@@ -23,7 +23,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendMessageEvent>((event, emit) async {
       final userId = getIt<SessionManager>().currentUser!.id;
 
-      /// YOUR MESSAGE
       final myMessage = Message(
         id: const Uuid().v4(),
         chatId: event.chatId,
@@ -34,24 +33,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       await sendMessage(myMessage);
 
-      var msgs = await getMessages(event.chatId);
-      emit(ChatLoaded(msgs));
+      final msgs = await getMessages(event.chatId);
+      emit(ChatLoaded(List.from(msgs)));
 
-      /// SIMULATED FRIEND REPLY
+      // Keep the handler alive so the emit below is within a valid handler scope
       await Future.delayed(const Duration(seconds: 1));
 
-      final botReply = Message(
+      final botMessage = Message(
         id: const Uuid().v4(),
         chatId: event.chatId,
-        senderId: "friend", // different sender
+        senderId: 'friend',
         text: _generateReply(event.text),
         createdAt: DateTime.now(),
       );
 
-      await sendMessage(botReply);
+      await sendMessage(botMessage);
 
-      msgs = await getMessages(event.chatId);
-      emit(ChatLoaded(msgs));
+      final updatedMsgs = await getMessages(event.chatId);
+      emit(ChatLoaded(List.from(updatedMsgs)));
     });
   }
   String _generateReply(String text) {
