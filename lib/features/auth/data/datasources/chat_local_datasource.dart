@@ -1,5 +1,5 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:vibe/core/database/isar_service.dart';
+import 'package:vibe/core/database/database_service.dart';
 import 'package:vibe/features/chat/data/models/chat_model.dart';
 
 import '../../domain/entities/chat.dart';

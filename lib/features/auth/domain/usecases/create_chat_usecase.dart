@@ -6,7 +6,7 @@ class CreateChatUseCase {
 
   CreateChatUseCase(this.repository);
 
-  Future<Chat> call(String myId, String friendCode) {
-    return repository.createChat(myId, friendCode);
+  Future<Chat> call(String myId, String inviteCode) {
+    return repository.createChat(myId, inviteCode);
   }
 }

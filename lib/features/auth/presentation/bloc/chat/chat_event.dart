@@ -12,3 +12,8 @@ class SendMessageEvent extends ChatEvent {
   final String text;
   SendMessageEvent(this.chatId, this.text);
 }
+
+class MessagesUpdatedEvent extends ChatEvent {
+  final List<Message> messages;
+  MessagesUpdatedEvent(this.messages);
+}

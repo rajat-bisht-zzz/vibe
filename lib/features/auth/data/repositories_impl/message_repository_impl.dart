@@ -13,7 +13,15 @@ class MessageRepositoryImpl implements MessageRepository {
   }
 
   @override
+  Stream<List<Message>> watchMessages(String chatId) {
+    return local.watchMessages(chatId);
+  }
+
+  @override
   Future<void> sendMessage(Message message) async {
     await local.sendMessage(message);
   }
+
+  @override
+  Future<void> clearAll() => local.clear();
 }

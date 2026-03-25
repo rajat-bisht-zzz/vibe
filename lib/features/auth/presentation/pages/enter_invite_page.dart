@@ -18,6 +18,12 @@ class _EnterInvitePageState extends State<EnterInvitePage> {
   final controller = TextEditingController();
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -41,6 +47,7 @@ class _EnterInvitePageState extends State<EnterInvitePage> {
             TextField(
               controller: controller,
               decoration: const InputDecoration(
+                labelText: "Invite code",
                 hintText: "VIBE-XXXXXX",
                 border: OutlineInputBorder(),
               ),

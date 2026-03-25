@@ -5,11 +5,12 @@ import 'package:vibe/core/storage/storage_manager.dart';
 import 'package:vibe/core/storage/user_directory.dart';
 
 import '../../../../../core/utils/password_hasher.dart';
-import '../../../data/datasources/chat_local_datasource.dart';
-import '../../../data/datasources/message_local_datasource.dart';
 import '../../../domain/entities/user.dart';
+import '../../../domain/usecases/clear_chat_data_usecase.dart';
 import '../../../domain/usecases/get_current_user_usecase.dart';
+import '../../../domain/usecases/get_user_by_username_usecase.dart';
 import '../../../domain/usecases/save_user_usecase.dart';
+import '../../../domain/usecases/save_user_to_db_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -22,31 +23,36 @@ String generateInviteCode() {
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SaveUserUseCase saveUserUseCase;
   final GetCurrentUserUseCase getCurrentUserUseCase;
+  final GetUserByUsernameUseCase getUserByUsernameUseCase;
+  final SaveUserToDbUseCase saveUserToDbUseCase;
+  final ClearChatDataUseCase clearChatDataUseCase;
 
   AuthBloc({
     required this.saveUserUseCase,
     required this.getCurrentUserUseCase,
+    required this.getUserByUsernameUseCase,
+    required this.saveUserToDbUseCase,
+    required this.clearChatDataUseCase,
   }) : super(AuthInitial()) {
-    /// App start check
     on<CheckAuthEvent>((event, emit) async {
       final user = await getCurrentUserUseCase();
 
       if (user != null) {
         getIt<SessionManager>().setUser(user);
         UserDirectory.addUser(user);
-
         emit(Authenticated(user));
       } else {
         emit(Unauthenticated());
       }
     });
 
-    /// User enters name
     on<RegisterEvent>((event, emit) async {
-      final existing = UserDirectory.getByUsername(event.username);
+      final inMemory = UserDirectory.getByUsername(event.username);
+      final existing =
+          inMemory ?? await getUserByUsernameUseCase(event.username);
 
       if (existing != null) {
-        emit(AuthError("Username already exists"));
+        emit(AuthError("Username already taken"));
         return;
       }
 
@@ -59,6 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         createdAt: DateTime.now(),
       );
 
+      await saveUserToDbUseCase(newUser);
       UserDirectory.addUser(newUser);
       await saveUserUseCase(newUser);
 
@@ -66,26 +73,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(Authenticated(newUser));
     });
 
-//login
     on<LoginEvent>((event, emit) async {
-      final user = UserDirectory.getByUsername(event.username);
+      final user = UserDirectory.getByUsername(event.username) ??
+          await getUserByUsernameUseCase(event.username);
 
       if (user == null || user.passwordHash != hashPassword(event.password)) {
         emit(AuthError("Invalid username or password"));
         return;
       }
 
+      UserDirectory.addUser(user);
       await saveUserUseCase(user);
       getIt<SessionManager>().setUser(user);
 
       emit(Authenticated(user));
     });
 
-    //Logout
     on<LogoutEvent>((event, emit) async {
       getIt<SessionManager>().clear();
-      await getIt<ChatLocalDataSource>().clear();
-      await getIt<MessageLocalDataSource>().clear();
+      UserDirectory.clear();
+      await clearChatDataUseCase();
       emit(Unauthenticated());
     });
   }
